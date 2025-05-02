@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Customer Analytics | Sibahle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+  <style>
+    :root {
+      --primary-brown: #8B5A2B;
+      --light-brown: #D2B48C;
+      --dark-brown: #5D4037;
+      --cream: #F5F5DC;
+      --white: #FFFFFF;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--cream);
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+    
+    .tab-button {
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .tab-button.active {
+      color: var(--primary-brown);
+    }
+    
+    .tab-button.active:after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: var(--primary-brown);
+    }
+    
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, var(--white) 0%, var(--cream) 100%);
+      border-left: 4px solid var(--primary-brown);
+    }
+    
+    .segment-card {
+      border-top: 3px solid;
+    }
+    
+    .tooltip-custom {
+      position: relative;
+    }
+    
+    .tooltip-custom:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: var(--dark-brown);
+      color: var(--white);
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 14px;
+      font-weight: normal;
+    }
+    
+    .tooltip-text:after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: var(--dark-brown) transparent transparent transparent;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Header with Navigation -->
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center py-4">
+        <div class="flex items-center mb-4 md:mb-0">
+          <div class="w-10 h-10 rounded-full bg-amber-900 flex items-center justify-center mr-3">
+            <span class="text-white font-bold text-lg">SS</span>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-amber-900">Customer Analytics</h1>
+            <p class="text-xs text-amber-700">by Sibahle Sithole</p>
+          </div>
+        </div>
+        
+        <nav>
+          <ul class="flex flex-wrap gap-1 md:gap-4">
+            <li>
+              <button class="tab-button px-3 py-2 text-amber-900 active" data-tab="overview">
+                <i class="fas fa-chart-pie mr-2"></i> Overview
+              </button>
+            </li>
+            <li>
+              <button class="tab-button px-3 py-2 text-amber-900" data-tab="segments">
+                <i class="fas fa-users mr-2"></i> Segments
+              </button>
+            </li>
+            <li>
+              <button class="tab-button px-3 py-2 text-amber-900" data-tab="fraud">
+                <i class="fas fa-shield-alt mr-2"></i> Fraud Dashboard
+              </button>
+            </li>
+            <li>
+              <button class="tab-button px-3 py-2 text-amber-900" data-tab="findings">
+                <i class="fas fa-lightbulb mr-2"></i> Key Findings
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-6">
+    <!-- Overview Tab -->
+    <section id="overview-tab" class="tab-content bg-white rounded-xl shadow-md p-6 mb-6 card-hover">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-amber-900">Project Overview</h2>
+        <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded">Updated: Today</span>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div>
+          <p class="mb-4 text-gray-700 leading-relaxed">
+            Welcome to the <span class="font-semibold text-amber-800">my Customer Segmentation Analysis Project</span>. This comprehensive platform provides deep insights into customer behavior patterns, segmentation, and fraud detection to drive strategic decision-making.
+          </p>
+          <p class="mb-4 text-gray-700 leading-relaxed">
+            My analysis leverages <span class="font-semibold">machine learning algorithms</span> on transaction data, demographic information, and customer interactions to classify users into distinct segments. The fraud detection system employs <span class="font-semibold">anomaly detection techniques</span> to identify suspicious patterns in real-time.
+          </p>
+        </div>
+        <div class="bg-amber-50 rounded-lg p-4 border border-amber-100">
+          <h3 class="font-semibold text-amber-900 mb-2">Key Benefits</h3>
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li class="flex items-start">
+              <svg class="w-4 h-4 mt-0.5 mr-2 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Personalized marketing strategies based on customer segments
+            </li>
+            <li class="flex items-start">
+              <svg class="w-4 h-4 mt-0.5 mr-2 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Reduced fraud losses through predictive detection
+            </li>
+            <li class="flex items-start">
+              <svg class="w-4 h-4 mt-0.5 mr-2 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Improved customer lifetime value through targeted engagement
+            </li>
+            <li class="flex items-start">
+              <svg class="w-4 h-4 mt-0.5 mr-2 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Real-time monitoring dashboards for operational teams
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="bg-amber-50 rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-semibold text-amber-900 mb-4">Project Highlights</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="stat-card p-4 rounded-lg">
+            <div class="text-sm text-amber-700 mb-1">Customer Segments Identified</div>
+            <div class="text-2xl font-bold text-amber-900">4</div>
+          </div>
+          <div class="stat-card p-4 rounded-lg">
+            <div class="text-sm text-amber-700 mb-1">Total Customers Analyzed</div>
+            <div class="text-2xl font-bold text-amber-900">284,807</div>
+          </div>
+          <div class="stat-card p-4 rounded-lg">
+            <div class="text-sm text-amber-700 mb-1">Fraud Detection Accuracy</div>
+            <div class="text-2xl font-bold text-amber-900">96.7%</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg border border-gray-100 p-4">
+          <h4 class="font-semibold text-amber-900 mb-3">Methodology</h4>
+          <p class="text-sm text-gray-700 mb-3">
+            This segmentation approach combines <span class="font-medium">k-means clustering</span> with <span class="font-medium">principal component analysis</span> to identify distinct customer groups based on spending patterns, transaction frequency, and demographic attributes.
+          </p>
+          <p class="text-sm text-gray-700">
+            The fraud detection system utilizes <span class="font-medium">isolation forests</span> and <span class="font-medium">gradient boosting</span> to identify anomalous transactions with high precision while minimizing false positives.
+          </p>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-100 p-4">
+          <h4 class="font-semibold text-amber-900 mb-3">Data Sources</h4>
+          <ul class="text-sm text-gray-700 space-y-1">
+            <li>• Transaction records (12 months)</li>
+            <li>• Customer demographic profiles</li>
+            <li>• Web and mobile engagement metrics</li>
+            <li>• Customer service interactions</li>
+            <li>• Historical fraud cases</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Segments Tab -->
+    <section id="segments-tab" class="tab-content bg-white rounded-xl shadow-md p-6 mb-6 hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-amber-900">Customer Segmentation Analysis</h2>
+        <div class="tooltip-custom">
+          <button class="text-amber-700 hover:text-amber-900">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </button>
+          <span class="tooltip-text">Segments were identified using unsupervised machine learning techniques on transaction and demographic data</span>
+        </div>
+      </div>
+      
+      <div class="mb-6">
+        <p class="text-gray-700 mb-4">
+          The clustering analysis identified <span class="font-semibold text-amber-800">four distinct customer segments</span>, each with unique characteristics, behaviors, and needs. Understanding these segments allows for targeted marketing, personalized services, and optimized customer experiences.
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="segment-cards">
+        <!-- Segment cards will be populated by JavaScript -->
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-lg border border-gray-100 p-4 card-hover">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-lg font-semibold text-amber-900">Customer Segments Distribution</h3>
+            <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded">Primary Analysis</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="segmentChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-lg border border-gray-100 p-4 card-hover">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-lg font-semibold text-amber-900">Average Total Spending by Segment</h3>
+            <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded">ZAR</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="spendingChart"></canvas>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">
+            <span class="font-medium">Insight:</span> Budget Savers show the highest total spending despite their value consciousness, while Young Professionals spend the least.
+          </p>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg border border-gray-100 p-4 card-hover">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-lg font-semibold text-amber-900">Average Transaction Count by Segment</h3>
+            <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded">Count</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="transactionChart"></canvas>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">
+            <span class="font-medium">Insight:</span> Budget Savers conduct the most transactions, aligning with their high total spending.
+          </p>
+        </div>
+        
+        <div class="bg-white rounded-lg border border-gray-100 p-4 card-hover">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-lg font-semibold text-amber-900">Age Distribution by Segment</h3>
+            <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded">Years</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="ageChart"></canvas>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">
+            <span class="font-medium">Insight:</span> High-Value Loyalists tend to be older, while Young Professionals have the lowest median age.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fraud Tab -->
+    <section id="fraud-tab" class="tab-content bg-white rounded-xl shadow-md p-6 mb-6 hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-amber-900">Fraud Detection Dashboard</h2>
+        <div class="flex items-center">
+          <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded mr-2">Live Data</span>
+          <div class="flex items-center text-sm text-gray-500">
+            <span class="flex h-2 w-2 mr-1">
+              <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-red-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            </span>
+            Real-time monitoring
+          </div>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="stat-card p-4 rounded-lg">
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="text-sm text-amber-700 mb-1">Average Fraud Rate</div>
+              <div class="text-2xl font-bold text-amber-900">0.45%</div>
+            </div>
+            <div class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded">-0.02%</div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Overall transaction fraud rate across all regions</p>
+        </div>
+        
+        <div class="stat-card p-4 rounded-lg">
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="text-sm text-amber-700 mb-1">Highest Risk Time</div>
+              <div class="text-2xl font-bold text-amber-900">11:00</div>
+            </div>
+            <div class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded">+0.13%</div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Peak fraud rate (0.58%)</p>
+        </div>
+        
+        <div class="stat-card p-4 rounded-lg">
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="text-sm text-amber-700 mb-1">Highest Risk Region</div>
+              <div class="text-2xl font-bold text-amber-900">Eastern Cape</div>
+            </div>
+            <div class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded">Alert</div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Fraud rate (0.50%)</p>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-lg border border-gray-100 p-4 card-hover">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-lg font-semibold text-amber-900">Fraud Rate by Hour of Day</h3>
+            <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded">24h Pattern</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="hourlyFraudChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-lg border border-gray-100 p-4 card-hover">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-lg font-semibold text-amber-900">Fraud Rate by Province</h3>
+            <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded">Regional</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="provinceFraudChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg border border-gray-100 p-4 mb-6 card-hover">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-lg font-semibold text-amber-900">Top Features for Fraud Detection</h3>
+          <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded">Model Analysis</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="featureImportanceChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-amber-50 rounded-lg p-4 border border-amber-100">
+        <h3 class="text-lg font-semibold text-amber-900 mb-3">Fraud Prevention Recommendations</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white p-3 rounded-lg border border-amber-100">
+            <h4 class="font-medium text-amber-800 mb-1">Time-Based Monitoring</h4>
+            <p class="text-sm text-gray-700">
+              Increase fraud detection sensitivity between 10:00-14:00 when fraud rates peak (0.58% at 11:00).
+            </p>
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-amber-100">
+            <h4 class="font-medium text-amber-800 mb-1">Regional Focus</h4>
+            <p class="text-sm text-gray-700">
+              Implement additional verification steps for transactions originating from Eastern Cape (0.50% fraud rate).
+            </p>
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-amber-100">
+            <h4 class="font-medium text-amber-800 mb-1">Transaction Amount</h4>
+            <p class="text-sm text-gray-700">
+              Flag transactions above ZAR 8,000 for manual review (median fraud transaction amount).
+            </p>
+          </div>
+          <div class="bg-white p-3 rounded-lg border border-amber-100">
+            <h4 class="font-medium text-amber-800 mb-1">Feature Monitoring</h4>
+            <p class="text-sm text-gray-700">
+              Prioritize monitoring of transactions with abnormal V14 and V7 values (top predictive features).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Findings Tab -->
+    <section id="findings-tab" class="tab-content bg-white rounded-xl shadow-md p-6 mb-6 hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-amber-900">Key Findings & Strategic Insights</h2>
+        <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded">Confidential</span>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <div class="bg-white rounded-lg border border-gray-100 p-4 mb-6 card-hover">
+            <h3 class="text-lg font-semibold text-amber-900 mb-3 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              Segment Distribution
+            </h3>
+            <p class="text-gray-700 mb-3">
+              The customer base is <span class="font-semibold text-amber-800">evenly distributed</span> across all four segments, with Budget Savers slightly leading at 25.5%, followed by High-Value Loyalists (25.4%), Young Professionals (25.3%), and Occasional Users (23.8%).
+            </p>
+            <p class="text-sm text-gray-600 bg-amber-50 p-3 rounded-lg">
+              <span class="font-medium text-amber-800">Recommendation:</span> Develop balanced marketing strategies that address the unique needs of each segment while maintaining broad appeal.
+            </p>
+          </div>
+          
+          <div class="bg-white rounded-lg border border-gray-100 p-4 mb-6 card-hover">
+            <h3 class="text-lg font-semibold text-amber-900 mb-3 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Age Demographics
+            </h3>
+            <p class="text-gray-700 mb-3">
+              High-Value Loyalists tend to be <span class="font-semibold text-amber-800">older (60-70 years)</span> than other segments, while Young Professionals have the lowest median age (around 38). Budget Savers and Occasional Users have similar age distributions (median age 42-47).
+            </p>
+            <p class="text-sm text-gray-600 bg-amber-50 p-3 rounded-lg">
+              <span class="font-medium text-amber-800">Recommendation:</span> Tailor communication channels and messaging by age group - digital-first for Young Professionals, more traditional for High-Value Loyalists.
+            </p>
+          </div>
+          
+          <div class="bg-white rounded-lg border border-gray-100 p-4 mb-6 card-hover">
+            <h3 class="text-lg font-semibold text-amber-900 mb-3 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Spending Patterns
+            </h3>
+            <p class="text-gray-700 mb-3">
+              Budget Savers have the <span class="font-semibold text-amber-800">highest total spending</span> (approximately ZAR 26,000) despite their value consciousness, followed by High-Value Loyalists (ZAR 20,000). Young Professionals spend the least (ZAR 16,000).
+            </p>
+            <p class="text-sm text-gray-600 bg-amber-50 p-3 rounded-lg">
+              <span class="font-medium text-amber-800">Recommendation:</span> Develop loyalty programs for Budget Savers to maintain their engagement, and targeted upsell strategies for Young Professionals to increase their spending.
+            </p>
+          </div>
+        </div>
+        
+        <div>
+          <div class="bg-white rounded-lg border border-gray-100 p-4 mb-6 card-hover">
+            <h3 class="text-lg font-semibold text-amber-900 mb-3 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+              Fraud Timing Patterns
+            </h3>
+            <p class="text-gray-700 mb-3">
+              Fraud rates <span class="font-semibold text-amber-800">peak at 11:00 (0.58%)</span> and 13:00 (0.56%), with a significant dip around 18:00 (0.32%). This suggests fraudsters may be targeting times when transaction volumes are high to blend in.
+            </p>
+            <p class="text-sm text-gray-600 bg-amber-50 p-3 rounded-lg">
+              <span class="font-medium text-amber-800">Recommendation:</span> Implement dynamic fraud detection thresholds that adjust based on time of day, with stricter rules during peak fraud hours.
+            </p>
+          </div>
+          
+          <div class="bg-white rounded-lg border border-gray-100 p-4 mb-6 card-hover">
+            <h3 class="text-lg font-semibold text-amber-900 mb-3 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              Regional Fraud Patterns
+            </h3>
+            <p class="text-gray-700 mb-3">
+              <span class="font-semibold text-amber-800">Eastern Cape</span> shows the highest fraud rate at 0.50%, followed by Limpopo (0.48%) and Gauteng (0.47%). Free State has the lowest fraud rate at 0.27%.
+            </p>
+            <p class="text-sm text-gray-600 bg-amber-50 p-3 rounded-lg">
+              <span class="font-medium text-amber-800">Recommendation:</span> Develop region-specific fraud prevention strategies, with additional verification steps for high-risk provinces and optimized processes for low-risk areas.
+            </p>
+          </div>
+          
+          <div class="bg-white rounded-lg border border-gray-100 p-4 mb-6 card-hover">
+            <h3 class="text-lg font-semibold text-amber-900 mb-3 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+              </svg>
+              Fraud Detection Features
+            </h3>
+            <p class="text-gray-700 mb-3">
+              Our machine learning model identified <span class="font-semibold text-amber-800">V14 as the most important feature</span> for fraud detection (importance: 0.27), followed by V7 (0.20). These anonymized transaction features provide strong signals for potential fraud.
+            </p>
+            <p class="text-sm text-gray-600 bg-amber-50 p-3 rounded-lg">
+              <span class="font-medium text-amber-800">Recommendation:</span> Focus real-time monitoring on transactions with abnormal V14 and V7 values, and investigate these features further to understand their business meaning.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="bg-amber-900 text-amber-100 py-6">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0">
+          <div class="flex items-center">
+            <div class="w-8 h-8 rounded-full bg-amber-700 flex items-center justify-center mr-2">
+              <span class="text-amber-100 font-bold text-sm">SS</span>
+            </div>
+            <span class="font-medium">Sibahle Sithole</span>
+          </div>
+          <p class="text-xs mt-1">&copy; 2025 All Rights Reserved</p>
+        </div>
+        
+        <div class="text-sm">
+          <p class="mb-1">For more information:</p>
+          <div class="flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            <span>sbahlesithole707@gmail.com</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Data
+    const segmentData = [
+      { 
+        name: 'Budget Savers', 
+        value: 25.5, 
+        fill: '#8B5A2B', 
+        spending: 26000, 
+        transactions: 44, 
+        age: 45,
+        icon: 'fa-tags'
+      },
+      { 
+        name: 'Occasional Users', 
+        value: 23.8, 
+        fill: '#A0522D', 
+        spending: 18000, 
+        transactions: 39, 
+        age: 42,
+        icon: 'fa-calendar-alt'
+      },
+      { 
+        name: 'High-Value Loyalists', 
+        value: 25.4, 
+        fill: '#D2691E', 
+        spending: 20000, 
+        transactions: 40, 
+        age: 65,
+        icon: 'fa-crown'
+      },
+      { 
+        name: 'Young Professionals', 
+        value: 25.3, 
+        fill: '#CD853F', 
+        spending: 16000, 
+        transactions: 35, 
+        age: 38,
+        icon: 'fa-briefcase'
+      }
+    ];
+
+    const fraudByHour = [
+      { hour: '00:00', rate: 0.52 }, { hour: '01:00', rate: 0.51 }, 
+      { hour: '02:00', rate: 0.49 }, { hour: '03:00', rate: 0.44 }, 
+      { hour: '04:00', rate: 0.43 }, { hour: '05:00', rate: 0.44 }, 
+      { hour: '06:00', rate: 0.41 }, { hour: '07:00', rate: 0.40 }, 
+      { hour: '08:00', rate: 0.44 }, { hour: '09:00', rate: 0.42 }, 
+      { hour: '10:00', rate: 0.39 }, { hour: '11:00', rate: 0.58 }, 
+      { hour: '12:00', rate: 0.42 }, { hour: '13:00', rate: 0.56 }, 
+      { hour: '14:00', rate: 0.47 }, { hour: '15:00', rate: 0.45 }, 
+      { hour: '16:00', rate: 0.38 }, { hour: '17:00', rate: 0.32 }, 
+      { hour: '18:00', rate: 0.45 }, { hour: '19:00', rate: 0.42 }, 
+      { hour: '20:00', rate: 0.46 }, { hour: '21:00', rate: 0.54 }, 
+      { hour: '22:00', rate: 0.42 }, { hour: '23:00', rate: 0.51 }
+    ];
+
+    const fraudByProvince = [
+      { province: 'Eastern Cape', rate: 0.50 },
+      { province: 'Free State', rate: 0.27 },
+      { province: 'Gauteng', rate: 0.47 },
+      { province: 'KwaZulu-Natal', rate: 0.45 },
+      { province: 'Limpopo', rate: 0.41 },
+      { province: 'Mpumalanga', rate: 0.48 },
+      { province: 'North West', rate: 0.39 },
+      { province: 'Northern Cape', rate: 0.47 },
+      { province: 'Western Cape', rate: 0.47 }
+    ];
+
+    const featureImportance = [
+      { feature: 'V14', importance: 0.27 },
+      { feature: 'V7', importance: 0.20 },
+      { feature: 'V10', importance: 0.07 },
+      { feature: 'V12', importance: 0.06 },
+      { feature: 'V4', importance: 0.04 },
+      { feature: 'V17', importance: 0.03 },
+      { feature: 'V27', importance: 0.03 },
+      { feature: 'V8', importance: 0.02 },
+      { feature: 'V1', importance: 0.02 },
+      { feature: 'amount', importance: 0.02 }
+    ];
+
+    // Helper functions
+    function getSegmentDescription(segment) {
+      switch (segment) {
+        case 'Budget Savers':
+          return 'Value-conscious customers who make frequent purchases but focus on optimizing costs and finding deals';
+        case 'Occasional Users':
+          return 'Customers who engage with our products periodically with moderate spending and no strong loyalty patterns';
+        case 'High-Value Loyalists':
+          return 'Dedicated, long-term customers with strong brand loyalty and higher-than-average spending';
+        case 'Young Professionals':
+          return 'Career-focused customers in early to mid-career stages with growing disposable income';
+        default:
+          return '';
+      }
+    }
+
+    // Tab functionality
+    function setupTabs() {
+      const tabs = document.querySelectorAll('.tab-button');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remove active class from all tabs
+          tabs.forEach(t => t.classList.remove('active'));
+          // Add active class to clicked tab
+          tab.classList.add('active');
+          
+          // Hide all tab contents
+          tabContents.forEach(content => content.classList.add('hidden'));
+          // Show selected tab content
+          const tabId = tab.getAttribute('data-tab');
+          document.getElementById(`${tabId}-tab`).classList.remove('hidden');
+          
+          // Dispatch resize event to ensure charts render correctly
+          window.dispatchEvent(new Event('resize'));
+        });
+      });
+    }
+
+    // Initialize segment cards
+    function setupSegmentCards() {
+      const container = document.getElementById('segment-cards');
+      
+      segmentData.forEach(segment => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-lg shadow p-4 segment-card border-t-4';
+        card.style.borderTopColor = segment.fill;
+        
+        card.innerHTML = `
+          <div class="flex items-start mb-2">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center mr-3" style="background-color: ${segment.fill}20; border: 1px solid ${segment.fill}">
+              <i class="fas ${segment.icon} text-sm" style="color: ${segment.fill}"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-800">${segment.name}</h3>
+              <div class="text-2xl font-bold" style="color: ${segment.fill}">${segment.value}%</div>
+            </div>
+          </div>
+          <p class="text-xs text-gray-600">${getSegmentDescription(segment.name)}</p>
+          <div class="mt-3 pt-2 border-t border-gray-100 text-xs">
+            <div class="flex justify-between">
+              <span class="text-gray-500">Avg. Spend:</span>
+              <span class="font-medium">ZAR ${segment.spending.toLocaleString()}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Avg. Age:</span>
+              <span class="font-medium">${segment.age}</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Initialize charts
+    function setupCharts() {
+      // Segment Chart
+      const segmentCtx = document.getElementById('segmentChart').getContext('2d');
+      new Chart(segmentCtx, {
+        type: 'doughnut',
+        data: {
+          labels: segmentData.map(s => s.name),
+          datasets: [{
+            data: segmentData.map(s => s.value),
+            backgroundColor: segmentData.map(s => s.fill),
+            borderColor: '#F5F5DC',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+                pointStyle: 'circle'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.label}: ${context.parsed}%`;
+                }
+              }
+            },
+            datalabels: {
+              display: false
+            }
+          }
+        }
+      });
+
+      // Spending by Segment Chart
+      const spendingCtx = document.getElementById('spendingChart').getContext('2d');
+      new Chart(spendingCtx, {
+        type: 'bar',
+        data: {
+          labels: segmentData.map(s => s.name),
+          datasets: [{
+            label: 'Total Spending (ZAR)',
+            data: segmentData.map(s => s.spending),
+            backgroundColor: segmentData.map(s => s.fill),
+            borderColor: segmentData.map(s => s.fill),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                drawBorder: false
+              },
+              ticks: {
+                callback: function(value) {
+                  return 'ZAR ' + value.toLocaleString();
+                }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return 'ZAR ' + context.parsed.y.toLocaleString();
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Transaction Count by Segment Chart
+      const transactionCtx = document.getElementById('transactionChart').getContext('2d');
+      new Chart(transactionCtx, {
+        type: 'bar',
+        data: {
+          labels: segmentData.map(s => s.name),
+          datasets: [{
+            label: 'Number of Transactions',
+            data: segmentData.map(s => s.transactions),
+            backgroundColor: segmentData.map(s => `${s.fill}80`),
+            borderColor: segmentData.map(s => s.fill),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                drawBorder: false
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+
+      // Age Distribution by Segment Chart
+      const ageCtx = document.getElementById('ageChart').getContext('2d');
+      new Chart(ageCtx, {
+        type: 'bar',
+        data: {
+          labels: segmentData.map(s => s.name),
+          datasets: [{
+            label: 'Median Age',
+            data: segmentData.map(s => s.age),
+            backgroundColor: segmentData.map(s => `${s.fill}40`),
+            borderColor: segmentData.map(s => s.fill),
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                drawBorder: false
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+
+      // Hourly Fraud Chart
+      const hourlyFraudCtx = document.getElementById('hourlyFraudChart').getContext('2d');
+      new Chart(hourlyFraudCtx, {
+        type: 'line',
+        data: {
+          labels: fraudByHour.map(f => f.hour),
+          datasets: [{
+            label: 'Fraud Rate',
+            data: fraudByHour.map(f => f.rate),
+            borderColor: '#8B5A2B',
+            backgroundColor: 'rgba(139, 90, 43, 0.1)',
+            tension: 0.3,
+            fill: true,
+            pointBackgroundColor: '#8B5A2B',
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 0.3,
+              max: 0.6,
+              grid: {
+                drawBorder: false
+              },
+              ticks: {
+                callback: function(value) {
+                  return value + '%';
+                }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.parsed.y}% fraud rate`;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Province Fraud Chart
+      const provinceFraudCtx = document.getElementById('provinceFraudChart').getContext('2d');
+      new Chart(provinceFraudCtx, {
+        type: 'bar',
+        data: {
+          labels: fraudByProvince.map(f => f.province),
+          datasets: [{
+            label: 'Fraud Rate',
+            data: fraudByProvince.map(f => f.rate),
+            backgroundColor: '#8B5A2B',
+            borderColor: '#8B5A2B',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 0.55,
+              grid: {
+                drawBorder: false
+              },
+              ticks: {
+                callback: function(value) {
+                  return value + '%';
+                }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                autoSkip: false,
+                maxRotation: 45,
+                minRotation: 45
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.parsed.y}% fraud rate`;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Feature Importance Chart
+      const featureCtx = document.getElementById('featureImportanceChart').getContext('2d');
+      new Chart(featureCtx, {
+        type: 'bar',
+        data: {
+          labels: featureImportance.map(f => f.feature),
+          datasets: [{
+            label: 'Importance',
+            data: featureImportance.map(f => f.importance),
+            backgroundColor: '#8B5A2B',
+            borderColor: '#8B5A2B',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              beginAtZero: true,
+              max: 0.3,
+              grid: {
+                drawBorder: false
+              }
+            },
+            y: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `Importance: ${context.parsed.x}`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load Font Awesome
+      const faScript = document.createElement('script');
+      faScript.src = 'https://kit.fontawesome.com/a076d05399.js';
+      document.head.appendChild(faScript);
+      
+      setupTabs();
+      setupSegmentCards();
+      setupCharts();
+      
+      // Show overview tab by default
+      document.querySelector('.tab-button[data-tab="overview"]').click();
+    });
+  </script>
+</body>
+</html>
